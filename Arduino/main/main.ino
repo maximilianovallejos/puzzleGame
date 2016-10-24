@@ -40,13 +40,22 @@ int lvl4_secretCode;//valor del codigo. ej 5469
 
 
 
-void setup() {
-  
+void setup()
+{
+  lvl1Setup();
+  lvl2Setup();
+  lvl3Setup();
+  lvl4Setup();
 
 }
 
 void loop() 
 {
+
+  lvl1Update();
+  lvl2Update();
+  lvl3Update();
+  lvl4Update();
 
   checkLevelsChanged();
 
@@ -68,10 +77,10 @@ void updateDisplay()
 //actualiza indicadores leds
 void updateIndicatorLeds()
 {
-  checkLvl1();
-  checkLvl2();
-  checkLvl3();
-  checkLvl4();
+  updateLvl1Leds();
+  updateLvl2Leds();
+  updateLvl3Leds();
+  updateLvl4Leds();
 }
 
 //si algun nivel cambio
