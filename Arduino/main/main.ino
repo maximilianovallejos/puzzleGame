@@ -25,10 +25,10 @@ int maxErrors;
 int totalErrors;
 
 //level 1 - cables
-bool lvl1_wiresState[]//estado de los cables (conectado/desconectado). ej 0,1,0
+bool lvl1_wiresState[3];//estado de los cables (conectado/desconectado). ej 0,1,0
 
 //level 2 - simon
-int lvl2_colors[];//secuencia de colores. ej 1,2,2,4,1,3
+int lvl2_colors[6];//secuencia de colores. ej 1,2,2,4,1,3
 
 //level 3 - potenciometros
 //
@@ -79,23 +79,5 @@ bool checkLevelsChanged()
 {
   return checkLvl1() && checkLvl2() && checkLvl3() && checkLvl4() ;
 }
-
-bool checkLvl1()
-{
-  return false;
-}
-bool checkLvl2()
-{
-  return false;
-}
-bool checkLvl3()
-{
-  return false;
-}
-bool checkLvl4()
-{
-  return false;
-}
-
 
 
