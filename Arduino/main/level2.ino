@@ -1,5 +1,8 @@
 //color simon
 
+//pines
+const int LVL2_GREEN = 32;
+const int LVL2_RED = 33;
 
 void lvl2Setup()
 {
@@ -16,4 +19,6 @@ bool checkLvl2()
 
 void updateLvl2Leds()
 {
+  digitalWrite(LVL2_GREEN, level2Completed);
+  digitalWrite(LVL2_RED, !level2Completed);
 }
