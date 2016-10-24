@@ -23,6 +23,7 @@ bool level4Changed;
 const int MAX_ERRORS = 3;
 int totalErrors;
 bool gameStarted;
+bool timedOut;
 
 //tiempo total en milisegundos
 const float TOTAL_GAME_TIME = 120000;
@@ -70,33 +71,50 @@ void loop()
 {
   if(CHECK_MIN_TIME <= millis() - lastCheckTime)
   {
-    lastCheckTime = millis();
-    lvl1Update();
-    lvl2Update();
-    lvl3Update();
-    lvl4Update();
-  
-    anyLevelChanged = checkLevelsChanged();
-    if(gameStarted)
+    if(timedOut)
     {
-      updateGameTimer();   
-      updateIndicatorLeds();
+      //perdio
     }
-    else  
+    else
     {
-      if(anyLevelChanged)
+      lvl1Update();
+      lvl2Update();
+      lvl3Update();
+      lvl4Update();
+    
+      anyLevelChanged = checkLevelsChanged();
+      if(gameStarted)
       {
-        gameStartedTime = millis();
+        if(remainingGameTime <= 0)
+        {
+          //se termino el tiempo
+          timedOut = true;
+        }
+        else
+        {
+          updateGameTimer();   
+          updateIndicatorLeds();
+        }
       }
+      else  
+      {
+        if(anyLevelChanged)
+        {
+          //empezo a jugar
+          gameStartedTime = millis();
+          remainingGameTime = TOTAL_GAME_TIME;
+        }
+      }
+      updateDisplay();
+      lastCheckTime = millis();
     }
-    updateDisplay();
   }
 }
 
 //actualizar reloj
 void updateGameTimer()
 {
-   remainingGameTime = millis() - gameStartedTime;
+   remainingGameTime = remainingGameTime - (millis() - lastCheckTime) * getClockSpeed();
 }
 
 //dibuja en pantalla
