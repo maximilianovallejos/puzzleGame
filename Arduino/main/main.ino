@@ -1,3 +1,7 @@
+//#include <Wire.h>
+//#include <LCD.h>
+//#include <LiquidCrystal_I2C.h>
+
 int totalLevels = 4;
 
 //estado del nivel
@@ -39,6 +43,7 @@ const unsigned long CHECK_MIN_TIME = 100;
 unsigned long lastCheckTime = 0;
 
 
+int gameNumber;
 
 //level 1 - cables
 bool lvl1_wiresTarget[3];//estado de los cables (conectado/desconectado). ej 0,1,0
@@ -50,6 +55,8 @@ int lvl2_colorsTarget[6];//secuencia de colores. ej 1,2,2,4,1,3
 //
 int lvl3_value1Target;//valor correcto de potencia1. ej 280
 int lvl3_value2Target;//valor correcto de potencia2. ej 900
+int lvl3_value3Target;//valor correcto de potencia2. ej 900
+int lvl3_value4Target;//valor correcto de potencia2. ej 900
 
 //level 4 - keycode
 int lvl4_secretCodeTarget;//valor del codigo. ej 5469
@@ -60,6 +67,9 @@ void setup()
 {
   gameStarted = false;
   totalErrors = 0;
+
+  randomSeed(analogRead(0));
+  gameNumber = random(1000, 10000);//el codigo de desactvacion de 4 digitos
   
   lvl1Setup();
   lvl2Setup();
@@ -92,6 +102,10 @@ void loop()
         }
         else
         {
+          if(checkAnyError())
+          {
+            totalErrors++;
+          }
           updateGameTimer();   
           updateIndicatorLeds();
         }
@@ -135,6 +149,11 @@ void updateIndicatorLeds()
 bool checkLevelsChanged()
 {
   return checkLvl1() || checkLvl2() || checkLvl3() || checkLvl4() ;
+}
+
+bool checkAnyError()
+{
+  return checkErrorLvl1() || checkErrorLvl2() || checkErrorLvl3() || checkErrorLvl4() ;
 }
 
 
