@@ -134,7 +134,7 @@ void updateIndicatorLeds()
 //si algun nivel cambio
 bool checkLevelsChanged()
 {
-  return checkLvl1() && checkLvl2() && checkLvl3() && checkLvl4() ;
+  return checkLvl1() || checkLvl2() || checkLvl3() || checkLvl4() ;
 }
 
 
