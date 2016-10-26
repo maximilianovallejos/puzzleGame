@@ -66,6 +66,20 @@ void initTarget1()
 void lvl1Update()
 {
   updateWiresState();
+  if(!level1Completed && wiresCompleted())
+  {
+    level1Finished = true;
+  }
+}
+
+bool wiresCompleted()
+{
+  for(int i =0; i < TOTAL_WIRES; i++)
+  {
+    if(wiresCurrentState[i] != lvl1_wiresTarget[i])
+      return false;
+  }
+  return true;
 }
 
 bool checkLvl1()

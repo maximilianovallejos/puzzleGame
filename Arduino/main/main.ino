@@ -2,6 +2,8 @@
 #include <LCD.h>
 #include <LiquidCrystal_I2C.h>
 
+int const SPK_PIN = 9;
+
 byte dir = 0x27;
 LiquidCrystal_I2C lcd( dir, 2, 1, 0, 4, 5, 6, 7);
 bool displayEnabled = true;//for debug
@@ -32,6 +34,7 @@ const int MAX_ERRORS = 3;
 int totalErrors;
 bool gameStarted;
 bool timedOut;
+bool gameWon;
 
 //tiempo total en milisegundos
 const float TOTAL_GAME_TIME = 120000;
@@ -40,6 +43,10 @@ unsigned long remainingGameTime;//tiempo restante
 float getClockSpeed() //velocidad del reloj (aumenta por errores)
 {
   return 1 + 0.2 * totalErrors;
+}
+bool isPlaying()
+{
+  return gameStarted && !timedOut && !gameWon;
 }
 
 //update time
@@ -91,6 +98,14 @@ void loop()
     if(timedOut)
     {
       //perdio
+       if(displayEnabled)
+        updateDisplay();
+    }
+    else if(gameWon)
+    {
+      //gano
+       if(displayEnabled)
+        updateDisplay();
     }
     else
     {
@@ -109,12 +124,21 @@ void loop()
         }
         else
         {
-          if(checkAnyError())
+          if(anyLevelChanged)
           {
-            totalErrors++;
+            updateLevelStates();
+            updateIndicatorLeds();
+            if(checkAnyError())
+            {
+              totalErrors++;
+            }
+            else if(level1Completed && level2Completed && level3Completed && level4Completed)
+            {
+              gameWon = true;
+            }
+            
           }
           updateGameTimer();   
-          updateIndicatorLeds();
         }
       }
       else  
@@ -137,6 +161,12 @@ void loop()
 void updateGameTimer()
 {
    remainingGameTime = remainingGameTime - (millis() - lastCheckTime) * getClockSpeed();
+
+   //hacer un sonido por segundo
+   if(remainingGameTime % 1000 == 0)
+   {
+    playTimeSound();
+   }
 }
 
 void setupDisplay()
@@ -155,17 +185,40 @@ void setupDisplay()
 //dibuja en pantalla
 void updateDisplay()
 {
-  //timer
-  lcd.setCursor ( 0, 0 );
-  lcd.print(getRemainingFormatedTime());
-
-  //ingreso de codigo
-  lcd.setCursor (0,1);
-  lcd.print(getInputCode());
-
-  //secret code
-  lcd.setCursor (8,0);
-  lcd.print(String(lvl4_secretCodeTarget));
+  if(isPlaying())
+  {
+    //timer
+    lcd.setCursor ( 0, 0 );
+    lcd.print(getRemainingFormatedTime());
+  
+    //ingreso de codigo
+    lcd.setCursor (0,1);
+    lcd.print(getInputCode());
+  
+    //secret code
+    lcd.setCursor (8,0);
+    lcd.print(String(lvl4_secretCodeTarget));
+  }
+  else
+  {
+    lcd.noDisplay();
+    lcd.clear();
+    lcd.setCursor (0,1);
+    if(timedOut)
+    {
+      lcd.print("Perdiste!");
+    }
+    else if(gameWon)
+    {
+      lcd.print("Ganaste!");
+    }
+    delay(500);
+    lcd.display();
+    delay(500);
+    lcd.noDisplay();
+    delay(500);
+    lcd.display();
+  }
 }
 
 String getRemainingFormatedTime()
@@ -187,6 +240,52 @@ void updateIndicatorLeds()
   updateLvl2Leds();
   updateLvl3Leds();
   updateLvl4Leds();
+}
+
+void updateLevelStates()
+{
+  if(level1Finished)
+  {
+    level1Finished = false;
+    level1Completed = true;
+    playCompletedSound();
+  }
+  if(level2Finished)
+  {
+    level2Finished = false;
+    level2Completed = true;
+    playCompletedSound();
+  }
+  if(level3Finished)
+  {
+    level3Finished = false;
+    level3Completed = true;
+    playCompletedSound();
+  }
+  if(level4Finished)
+  {
+    level4Finished = false;
+    level4Completed = true;
+    playCompletedSound();
+  }
+}
+
+void playCompletedSound()
+{
+  //hacer un beep corto
+  tone(SPK_PIN, 350, 100);
+}
+
+void playErrorSound()
+{
+  //hacer un beep largo
+  tone(SPK_PIN, 150, 1000);
+}
+
+void playTimeSound()
+{
+  //hacer un beep corto
+  tone(SPK_PIN, 150, 100);
 }
 
 //si algun nivel cambio
