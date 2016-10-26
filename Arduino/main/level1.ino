@@ -82,7 +82,7 @@ bool wiresCompleted()
   return true;
 }
 
-bool checkLvl1()
+bool checkChangesLvl1()
 {
   //true si cambio el estado de un cable
   for(int i=0; i<TOTAL_WIRES; i++)

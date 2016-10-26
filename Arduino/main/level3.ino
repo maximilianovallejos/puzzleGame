@@ -9,16 +9,27 @@ const int POT2 = A2;
 const int POT3 = A3;
 const int POT4 = A4;
 
-void lvl3Setup()
-{
-  initTarget3();
-}
-
 int const LEFT = 0;
 int const RIGHT = 1023;
 int const UP = 1023;
 int const DOWN = 0;
 int const NONE = 512;
+
+int blinkStep;
+int blinkTotalSteps;
+
+//steps q espera cuando el nivel esta correcto
+const int lvl3StepsToComplete = 15;
+int lvl3CurrentSteps = 0;
+
+void lvl3Setup()
+{
+  blinkStep = 0;
+  blinkTotalSteps = 0;
+  lvl3CurrentSteps = 0;
+  initTarget3();
+}
+
 void initTarget3()
 {
   String tSeed = String(gameNumber).substring(2,2);
@@ -70,8 +81,7 @@ void initTarget3()
   }
 }
 
-int lvl3StepsToComplete = 15;
-int lvl3CurrentSteps = 0;
+
 void lvl3Update()
 {
   if(!level3Completed)
@@ -91,7 +101,7 @@ void lvl3Update()
   }
 }
 
-bool checkLvl3()
+bool checkChangesLvl3()
 {
   return false;
 }
@@ -114,8 +124,7 @@ void updateLvl3Leds()
   digitalWrite(LVL3_RED, !level3Completed);
 }
 
-int blinkStep;
-int blinkTotalSteps;
+
 //un step seria 100ms prende, 100ms apaga
 void blinkLed(int pin, int stepsDelay )
 {

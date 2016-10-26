@@ -52,7 +52,7 @@ void lvl2Update()
 {
 }
 
-bool checkLvl2()
+bool checkChangesLvl2()
 {
   return false;
 }

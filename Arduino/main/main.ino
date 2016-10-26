@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <LCD.h>
 #include <LiquidCrystal_I2C.h>
+#include <Keypad.h>
 
 int const SPK_PIN = 9;
 
@@ -76,10 +77,20 @@ int lvl4_secretCodeTarget;//valor del codigo. ej 5469
 
 void setup()
 {
+  randomSeed(analogRead(0));
+
+  //press # to start
+  setupSession();
+}
+
+void setupSession()
+{
   gameStarted = false;
   totalErrors = 0;
+  gameStarted = false;
+  timedOut = false;
+  gameWon = false;
 
-  randomSeed(analogRead(0));
   gameNumber = random(1000, 10000);//el codigo de desactvacion de 4 digitos
   
   lvl1Setup();
@@ -291,7 +302,7 @@ void playTimeSound()
 //si algun nivel cambio
 bool checkLevelsChanged()
 {
-  return checkLvl1() || checkLvl2() || checkLvl3() || checkLvl4() ;
+  return checkChangesLvl1() || checkChangesLvl2() || checkChangesLvl3() || checkChangesLvl4() ;
 }
 
 bool checkAnyError()
