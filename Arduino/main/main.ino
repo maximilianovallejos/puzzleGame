@@ -1,6 +1,10 @@
-//#include <Wire.h>
-//#include <LCD.h>
-//#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+#include <LCD.h>
+#include <LiquidCrystal_I2C.h>
+
+byte dir = 0x27;
+LiquidCrystal_I2C lcd( dir, 2, 1, 0, 4, 5, 6, 7);
+bool displayEnabled = true;//for debug
 
 int totalLevels = 4;
 
@@ -75,6 +79,9 @@ void setup()
   lvl2Setup();
   lvl3Setup();
   lvl4Setup();
+
+  if(displayEnabled)
+    setupDisplay();
 }
 
 void loop() 
@@ -119,7 +126,8 @@ void loop()
           remainingGameTime = TOTAL_GAME_TIME;
         }
       }
-      updateDisplay();
+      if(displayEnabled)
+        updateDisplay();
       lastCheckTime = millis();
     }
   }
@@ -131,10 +139,46 @@ void updateGameTimer()
    remainingGameTime = remainingGameTime - (millis() - lastCheckTime) * getClockSpeed();
 }
 
+void setupDisplay()
+{
+  
+  lcd.begin (16,2);    // Inicializar el display con 16 caraceres 2 lineas
+  lcd.setBacklightPin(3,POSITIVE);
+  lcd.setBacklight(HIGH);
+
+  lcd.home ();
+ // lcd.print("asd");
+ // lcd.setCursor ( 0, 1 );        // go to the 2nd line
+  //lcd.print("asd2");
+}
+
 //dibuja en pantalla
 void updateDisplay()
 {
+  //timer
+  lcd.setCursor ( 0, 0 );
+  lcd.print(getRemainingFormatedTime());
+
+  //ingreso de codigo
+  lcd.setCursor (0,1);
+  lcd.print(getInputCode());
+
+  //secret code
+  lcd.setCursor (8,0);
+  lcd.print(String(lvl4_secretCodeTarget));
 }
+
+String getRemainingFormatedTime()
+{
+  int seconds = remainingGameTime / 1000;
+  return String (seconds) + "s";
+}
+
+String getInputCode()
+{
+  return "_ _ _ _";
+}
+
 
 //actualiza indicadores leds
 void updateIndicatorLeds()
