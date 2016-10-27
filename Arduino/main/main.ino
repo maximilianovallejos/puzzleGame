@@ -9,6 +9,23 @@ byte dir = 0x27;
 LiquidCrystal_I2C lcd( dir, 2, 1, 0, 4, 5, 6, 7);
 bool displayEnabled = true;//for debug
 
+const byte K_ROWS = 4;
+const byte K_COLS = 4;
+
+byte K_ROW_PINS[] = {7, 6, 5, 4};
+byte K_COL_PINS[] = { 3, 2, 1, 0};
+char Keys [ K_ROWS ][ K_COLS ] =
+    {
+        {'1','2','3','A'},
+        {'4','5','6','B'},
+        {'7','8','9','C'},
+        {'*','0','#','D'}
+     };
+char RESTART_KEY = '*';
+
+Keypad keypad = Keypad(makeKeymap(Keys), K_ROW_PINS, K_COL_PINS, K_ROWS, K_COLS);
+char input;
+
 int totalLevels = 4;
 
 //estado del nivel
@@ -36,6 +53,7 @@ int totalErrors;
 bool gameStarted;
 bool timedOut;
 bool gameWon;
+bool restartGame;
 
 //tiempo total en milisegundos
 const float TOTAL_GAME_TIME = 120000;
@@ -90,6 +108,23 @@ void setupSession()
   gameStarted = false;
   timedOut = false;
   gameWon = false;
+  restartGame = false;
+  
+  level1Completed = false;
+  level2Completed = false;
+  level3Completed = false;
+  level4Completed = false;
+  
+  level1Finished = false;
+  level2Finished = false;
+  level3Finished = false;
+  level4Finished = false;
+  
+  anyLevelChanged = false;
+  level1Changed = false;
+  level2Changed = false;
+  level3Changed = false;
+  level4Changed = false;
 
   gameNumber = random(1000, 10000);//el codigo de desactvacion de 4 digitos
   
@@ -104,6 +139,19 @@ void setupSession()
 
 void loop() 
 {
+  input = keypad.getKey();
+  if(input)
+  {
+    if(input == RESTART_KEY) 
+    {
+      restartGame = true;
+    }
+  }
+  if(restartGame)
+  {
+    setupSession();   
+    return;
+  }
   if(CHECK_MIN_TIME <= millis() - lastCheckTime)
   {
     if(timedOut)

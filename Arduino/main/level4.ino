@@ -6,23 +6,11 @@ const int LVL4_GREEN = 36;
 const int LVL4_RED = 37;
 
 
-const byte K_ROWS = 4;
-const byte K_COLS = 4;
 
-byte K_ROW_PINS[] = {7, 6, 5, 4};
-byte K_COL_PINS[] = { 3, 2, 1, 0};
 
 String lvl4Input;
 
-char Keys [ K_ROWS ][ K_COLS ] =
-    {
-        {'1','2','3','A'},
-        {'4','5','6','B'},
-        {'7','8','9','C'},
-        {'*','0','#','D'}
-     };
 
-Keypad keypad = Keypad(makeKeymap(Keys), K_ROW_PINS, K_COL_PINS, K_ROWS, K_COLS);
 
 bool lvl4KeyPressed;
 
@@ -50,7 +38,7 @@ void lvl4Update()
         level1Finished = true;
       }
     }
-    char input = keypad.getKey();
+    //char input = keypad.getKey();//lo leo en main
     if(input)
     {
       lvl4KeyPressed = true;
