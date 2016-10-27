@@ -16,6 +16,7 @@ bool lvl4KeyPressed;
 
 void lvl4Setup()
 {
+  Serial.println("lvl4Setup");
   lvl4KeyPressed = false;
   lvl4Input = "";
   initTarget4();
@@ -35,6 +36,7 @@ void lvl4Update()
       int inputN = lvl4Input.toInt();
       if(inputN == lvl4_secretCodeTarget)
       {
+        Serial.println("lvl4 finished");
         level1Finished = true;
       }
     }
@@ -52,6 +54,7 @@ bool checkChangesLvl4()
   if(lvl4KeyPressed)
   {
     lvl4KeyPressed = false;
+    Serial.println("lvl4 changed");
     return true;
   }
   return false;
@@ -64,6 +67,7 @@ bool checkErrorLvl4()
     int inputN = lvl4Input.toInt();
     if(inputN != lvl4_secretCodeTarget)
     {
+      Serial.println("lvl4 error");
       return true;
     }
   }

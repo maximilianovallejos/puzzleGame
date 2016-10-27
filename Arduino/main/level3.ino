@@ -24,6 +24,7 @@ int lvl3CurrentSteps = 0;
 
 void lvl3Setup()
 {
+  Serial.println("lvl3Setup");
   blinkStep = 0;
   blinkTotalSteps = 0;
   lvl3CurrentSteps = 0;
@@ -33,6 +34,7 @@ void lvl3Setup()
 void initTarget3()
 {
   String tSeed = String(gameNumber).substring(2,2);
+  Serial.println("lvl3 seed " + tSeed);
   int iSeed = tSeed.toInt();
 
   //TODO: completar con valores correctos
@@ -90,6 +92,7 @@ void lvl3Update()
     {
       if(lvl3CurrentSteps >= lvl3StepsToComplete)
       {
+        Serial.println("lvl3 finished");
         level3Finished = true;
       }
       else

@@ -6,6 +6,7 @@ const int LVL2_RED = 33;
 
 void lvl2Setup()
 {
+  Serial.println("lvl2Setup");
   initTarget2();
 }
 
@@ -13,6 +14,7 @@ void initTarget2()
 {
   String tSeed = String(gameNumber).substring(1,1);
   //lvl2_colorsTarget
+  Serial.println("lvl2 seed " + tSeed);
   switch(tSeed.toInt())
   {
     case 1:

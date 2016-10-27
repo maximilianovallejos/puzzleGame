@@ -103,6 +103,7 @@ void setup()
 
 void setupSession()
 {
+  Serial.println("setupSession");
   gameStarted = false;
   totalErrors = 0;
   gameStarted = false;
@@ -127,6 +128,8 @@ void setupSession()
   level4Changed = false;
 
   gameNumber = random(1000, 10000);//el codigo de desactvacion de 4 digitos
+  Serial.print("Game number: ");
+  Serial.println(String(gameNumber));
   
   lvl1Setup();
   lvl2Setup();
@@ -142,6 +145,8 @@ void loop()
   input = keypad.getKey();
   if(input)
   {
+    Serial.print("read input:");
+    Serial.println(String(input));
     if(input == RESTART_KEY) 
     {
       restartGame = true;
@@ -149,6 +154,7 @@ void loop()
   }
   if(restartGame)
   {
+    Serial.println("Restart game");
     setupSession();   
     return;
   }
@@ -156,12 +162,14 @@ void loop()
   {
     if(timedOut)
     {
+      Serial.println("Timeout GameOver");
       //perdio
        if(displayEnabled)
         updateDisplay();
     }
     else if(gameWon)
     {
+      Serial.println("Game WON!!");
       //gano
        if(displayEnabled)
         updateDisplay();
@@ -176,6 +184,7 @@ void loop()
       anyLevelChanged = checkLevelsChanged();
       if(gameStarted)
       {
+       
         if(remainingGameTime <= 0)
         {
           //se termino el tiempo
@@ -190,6 +199,9 @@ void loop()
             if(checkAnyError())
             {
               totalErrors++;
+              Serial.println("User make an error");
+              Serial.print("Total errors: ");
+              Serial.println(String(totalErrors));
             }
             else if(level1Completed && level2Completed && level3Completed && level4Completed)
             {
@@ -204,6 +216,7 @@ void loop()
       {
         if(anyLevelChanged)
         {
+           Serial.println("Start game");
           //empezo a jugar
           gameStartedTime = millis();
           remainingGameTime = TOTAL_GAME_TIME;
@@ -220,17 +233,29 @@ void loop()
 void updateGameTimer()
 {
    remainingGameTime = remainingGameTime - (millis() - lastCheckTime) * getClockSpeed();
-
-   //hacer un sonido por segundo
-   if(remainingGameTime % 1000 == 0)
+   if(remainingGameTime > 15000)
    {
-    playTimeSound();
+     if(remainingGameTime % 5000 == 0)
+     {
+      Serial.print("Time");
+      Serial.println(String(remainingGameTime/1000));
+      playTimeSound();
+     }
+   }
+   else
+   {
+    if(remainingGameTime % 1000 == 0)
+    {
+      Serial.print("Time");
+      Serial.println(String(remainingGameTime/1000));
+      playTimeSound();
+    }
    }
 }
 
 void setupDisplay()
 {
-  
+  Serial.println("setupDisplay");
   lcd.begin (16,2);    // Inicializar el display con 16 caraceres 2 lineas
   lcd.setBacklightPin(3,POSITIVE);
   lcd.setBacklight(HIGH);

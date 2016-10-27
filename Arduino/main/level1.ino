@@ -15,6 +15,7 @@ bool wiresLastState[TOTAL_WIRES];
 
 void lvl1Setup()
 {
+  Serial.println("lvl1Setup");
   initTarget1();
 
   pinMode(WIRE1, INPUT);
@@ -28,6 +29,7 @@ void lvl1Setup()
 void initTarget1()
 {
   String tSeed = String(gameNumber).substring(0,0);
+  Serial.println("lvl1 seed " + tSeed);
   switch(tSeed.toInt())
   {
     case 1:
@@ -68,6 +70,7 @@ void lvl1Update()
   updateWiresState();
   if(!level1Completed && wiresCompleted())
   {
+    Serial.println("lvl1 finished");
     level1Finished = true;
   }
 }
@@ -89,6 +92,7 @@ bool checkChangesLvl1()
   {
     if(wiresCurrentState[i] != wiresLastState[i])
     {
+      Serial.println("lvl1 changed");
       return true;
     }
   }
@@ -105,6 +109,7 @@ bool checkErrorLvl1()
       //si el cambio fue incorrecto
       if(wiresCurrentState[i] != lvl1_wiresTarget[i])
       {
+        Serial.println("lvl1 error");
         return true;
       }
     }
