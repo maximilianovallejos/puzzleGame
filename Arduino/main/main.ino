@@ -4,6 +4,7 @@
 #include <Keypad.h>
 
 int const SPK_PIN = 9;
+int const VIB_PIN = 10;
 
 byte dir = 0x27;
 LiquidCrystal_I2C lcd( dir, 2, 1, 0, 4, 5, 6, 7);
@@ -54,6 +55,7 @@ bool gameStarted;
 bool timedOut;
 bool gameWon;
 bool restartGame;
+bool vibError;
 
 //tiempo total en milisegundos
 const float TOTAL_GAME_TIME = 120000;
@@ -127,6 +129,8 @@ void setupSession()
   level3Changed = false;
   level4Changed = false;
 
+  vibError = false;
+
   gameNumber = random(1000, 10000);//el codigo de desactvacion de 4 digitos
   Serial.print("Game number: ");
   Serial.println(String(gameNumber));
@@ -142,6 +146,8 @@ void setupSession()
 
 void loop() 
 {
+  
+  
   input = keypad.getKey();
   if(input)
   {
@@ -192,6 +198,7 @@ void loop()
         }
         else
         {
+          vibError = digitalRead(VIB_PIN);
           if(anyLevelChanged)
           {
             updateLevelStates();
@@ -380,7 +387,11 @@ bool checkLevelsChanged()
 
 bool checkAnyError()
 {
-  return checkErrorLvl1() || checkErrorLvl2() || checkErrorLvl3() || checkErrorLvl4() ;
+  if(vibError)
+  {
+     Serial.println("vibration error");
+  }
+  return checkErrorLvl1() || checkErrorLvl2() || checkErrorLvl3() || checkErrorLvl4() || vibError;
 }
 
 
