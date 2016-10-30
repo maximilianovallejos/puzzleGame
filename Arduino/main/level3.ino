@@ -33,7 +33,7 @@ void lvl3Setup()
 
 void initTarget3()
 {
-  String tSeed = String(gameNumber).substring(2,2);
+  String tSeed = String(gameNumber).substring(2,3);
   Serial.println("lvl3 seed " + tSeed);
   int iSeed = tSeed.toInt();
 

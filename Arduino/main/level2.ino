@@ -12,7 +12,7 @@ void lvl2Setup()
 
 void initTarget2()
 {
-  String tSeed = String(gameNumber).substring(1,1);
+  String tSeed = String(gameNumber).substring(1,2);
   //lvl2_colorsTarget
   Serial.println("lvl2 seed " + tSeed);
   switch(tSeed.toInt())

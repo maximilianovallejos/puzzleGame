@@ -34,8 +34,9 @@ void lvl1Setup()
 
 void initTarget1()
 {
-  String tSeed = String(gameNumber).substring(0,0);
-  Serial.println("lvl1 seed " + tSeed);
+  String tSeed = String(gameNumber).substring(0,1);
+  Serial.print("lvl1 seed ");
+  Serial.println(tSeed);
   switch(tSeed.toInt())
   {
     case 1:
@@ -69,15 +70,23 @@ void initTarget1()
       lvl1_wiresTarget[2] = 0;
       break;
   }
+   Serial.println("lvl1 target");
+   Serial.println(lvl1_wiresTarget[0]);
+   Serial.println(lvl1_wiresTarget[1]);
+   Serial.println(lvl1_wiresTarget[2]);
+   Serial.println("--");
 }
 
 void lvl1Update()
 {
-  updateWiresState();
-  if(!level1Completed && wiresCompleted())
+  if(!level1Completed)
   {
-    Serial.println("lvl1 finished");
-    level1Finished = true;
+    updateWiresState();
+    if(gameStarted && wiresCompleted())
+    {
+      Serial.println("lvl1 finished");
+      level1Finished = true;
+    }
   }
 }
 
@@ -93,6 +102,9 @@ bool wiresCompleted()
 
 bool checkChangesLvl1()
 {
+  if(level1Completed)
+    return false;
+    
   //true si cambio el estado de un cable
   for(int i=0; i<TOTAL_WIRES; i++)
   {

@@ -54,6 +54,7 @@ int totalErrors;
 bool gameStarted;
 bool timedOut;
 bool gameWon;
+bool lost;
 bool restartGame;
 int vibError;
 
@@ -67,7 +68,7 @@ float getClockSpeed() //velocidad del reloj (aumenta por errores)
 }
 bool isPlaying()
 {
-  return gameStarted && !timedOut && !gameWon;
+  return gameStarted && !gameWon && !lost;
 }
 
 //update time
@@ -115,6 +116,7 @@ void setupSession()
   timedOut = false;
   gameWon = false;
   restartGame = false;
+  lost = false;
   
   level1Completed = false;
   level2Completed = false;
@@ -173,9 +175,20 @@ void loop()
   }
   if(CHECK_MIN_TIME <= millis() - lastCheckTime)
   {
+    if(totalErrors >= MAX_ERRORS)
+    {
+      Serial.println("To much errors GameOver");
+      totalErrors = 0;
+      lost = true;
+    }
     if(timedOut)
     {
       Serial.println("Timeout GameOver");
+      timedOut = false;
+      lost = true;
+    }
+    if(lost)
+    {
       //perdio
        if(displayEnabled)
         updateDisplay();
@@ -195,7 +208,7 @@ void loop()
       lvl4Update();
     
       anyLevelChanged = checkLevelsChanged();
-      if(gameStarted)
+      if(isPlaying() )
       {
        
         if(remainingGameTime <= 0)
@@ -209,10 +222,11 @@ void loop()
           {
             //vibError++;
           }
+          updateLevelStates();
+          updateIndicatorLeds();
           if(anyLevelChanged)
           {
-            updateLevelStates();
-            updateIndicatorLeds();
+           
             if(level1Completed && level2Completed && level3Completed && level4Completed)
             {
               gameWon = true;
@@ -294,6 +308,7 @@ void showStartMessage()
 }
 
 //dibuja en pantalla
+bool blinkLCD  = false;
 void updateDisplay()
 {
   if(gameStarted)
@@ -315,23 +330,27 @@ void updateDisplay()
     }
     else
     {
-      lcd.noDisplay();
-      lcd.clear();
       lcd.setCursor (0,1);
-      if(timedOut)
+      if(lost)
       {
+        
         lcd.print("Perdiste!");
       }
       else if(gameWon)
       {
         lcd.print("Ganaste!");
       }
-      delay(500);
-      lcd.display();
-      delay(500);
-      lcd.noDisplay();
-      delay(500);
-      lcd.display();
+      if(blinkLCD)
+      {
+        lcd.noDisplay();
+        delay(500);
+        lcd.display();
+        delay(500);
+        lcd.noDisplay();
+        delay(500);
+        lcd.display();
+        blinkLCD = false;
+      }
     }
   }
 }
@@ -363,24 +382,28 @@ void updateLevelStates()
   {
     level1Finished = false;
     level1Completed = true;
+    Serial.println("lvl1Completed");
     playCompletedSound();
   }
   if(level2Finished)
   {
     level2Finished = false;
     level2Completed = true;
+    Serial.println("lvl2Completed");
     playCompletedSound();
   }
   if(level3Finished)
   {
     level3Finished = false;
     level3Completed = true;
+    Serial.println("lvl3Completed");
     playCompletedSound();
   }
   if(level4Finished)
   {
     level4Finished = false;
     level4Completed = true;
+    Serial.println("lvl4Completed");
     playCompletedSound();
   }
 }
