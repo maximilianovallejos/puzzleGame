@@ -58,12 +58,12 @@ bool restartGame;
 int vibError;
 
 //tiempo total en milisegundos
-const float TOTAL_GAME_TIME = 30000;
+const float TOTAL_GAME_TIME = 300000;
 float gameStartedTime;//momento en q empieza el juego (primer movimiento)
 unsigned long remainingGameTime;//tiempo restante
 float getClockSpeed() //velocidad del reloj (aumenta por errores)
 {
-  return 1 + 0.2 * totalErrors;
+  return totalErrors * 2;
 }
 bool isPlaying()
 {
@@ -207,25 +207,26 @@ void loop()
         {
           if( digitalRead(VIB_PIN))
           {
-            vibError++;
+            //vibError++;
           }
           if(anyLevelChanged)
           {
             updateLevelStates();
             updateIndicatorLeds();
-            if(checkAnyError())
-            {
-              totalErrors++;
-              Serial.println("User make an error");
-              Serial.print("Total errors: ");
-              Serial.println(String(totalErrors));
-            }
-            else if(level1Completed && level2Completed && level3Completed && level4Completed)
+            if(level1Completed && level2Completed && level3Completed && level4Completed)
             {
               gameWon = true;
             }
             
           }
+          if(checkAnyError())
+          {
+            totalErrors++;
+            Serial.println("User make an error");
+            Serial.print("Total errors: ");
+            Serial.println(String(totalErrors));
+          }
+           
           updateGameTimer();   
         }
       }
@@ -250,8 +251,8 @@ void loop()
 //actualizar reloj
 void updateGameTimer()
 {
-   remainingGameTime = remainingGameTime - (millis() - lastCheckTime) * getClockSpeed();
-   Serial.println(String(remainingGameTime));
+   remainingGameTime = remainingGameTime - ((millis() - lastCheckTime) + (millis() - lastCheckTime) * getClockSpeed());
+   //Serial.println(String(remainingGameTime));
    if(remainingGameTime > 15000)
    {
      if((remainingGameTime-1000)  % 5000 <= 100)
@@ -297,6 +298,7 @@ void updateDisplay()
 {
   if(gameStarted)
   {
+    lcd.clear();
     if(isPlaying())
     {
       //timer
@@ -418,7 +420,7 @@ bool checkAnyError()
   {
     vibError = 0;
   }
-  return ;
+  return hasError;
 }
 
 

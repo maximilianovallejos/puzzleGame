@@ -106,6 +106,11 @@ void lvl3Update()
 
 bool checkChangesLvl3()
 {
+  if(100 < abs(512 - analogRead(POT1)) || 100 < abs(512 - analogRead(POT2)) || 100 < abs(512 - analogRead(POT3)) || 100 < abs(512 - analogRead(POT4)))
+  {
+    Serial.println("lvl3 changed");
+    return true;
+  }
   return false;
 }
 
