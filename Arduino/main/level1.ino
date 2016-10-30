@@ -4,8 +4,8 @@
 const int WIRE1 = 52;
 const int WIRE2 = 50;
 const int WIRE3 = 48;
-const int LVL1_GREEN = 30;
-const int LVL1_RED = 31;
+const int LVL1_GREEN = 7;
+const int LVL1_RED = 6;
 
 
 const int TOTAL_WIRES = 3;
@@ -21,6 +21,8 @@ void lvl1Setup()
   pinMode(WIRE1, INPUT_PULLUP);
   pinMode(WIRE2, INPUT_PULLUP);
   pinMode(WIRE3, INPUT_PULLUP);
+  pinMode(LVL1_GREEN, OUTPUT);
+  pinMode(LVL1_RED, OUTPUT);
   
   updateWiresState();
   updateLastState();

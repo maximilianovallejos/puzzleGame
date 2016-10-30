@@ -6,6 +6,8 @@ const int LVL2_RED = 33;
 
 void lvl2Setup()
 {
+  pinMode(LVL2_GREEN, OUTPUT);
+  pinMode(LVL2_RED, OUTPUT);
   Serial.println("lvl2Setup");
   initTarget2();
 }
