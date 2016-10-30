@@ -8,7 +8,6 @@ const int LVL4_RED = 37;
 
 
 
-String lvl4Input;
 
 
 
@@ -37,16 +36,26 @@ void lvl4Update()
       if(inputN == lvl4_secretCodeTarget)
       {
         Serial.println("lvl4 finished");
-        level1Finished = true;
+        level4Finished = true;
       }
+     
     }
     //char input = keypad.getKey();//lo leo en main
-    if(input)
+    /*if(input != NO_KEY)
     {
+      Serial.println("Read input lvl4");
       lvl4KeyPressed = true;
       lvl4Input = lvl4Input + String(input);
-    }
+      Serial.println("lvl4Input " + lvl4Input);
+    }*/
   }
+}
+
+void lvl4AddKey(String key)
+{
+  lvl4KeyPressed = true;
+  lvl4Input = lvl4Input + key;
+  Serial.println("lvl4Input " + lvl4Input);
 }
 
 bool checkChangesLvl4()
@@ -68,6 +77,7 @@ bool checkErrorLvl4()
     if(inputN != lvl4_secretCodeTarget)
     {
       Serial.println("lvl4 error");
+      lvl4Input = "";
       return true;
     }
   }

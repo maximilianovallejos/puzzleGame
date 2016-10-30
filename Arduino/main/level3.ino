@@ -171,6 +171,6 @@ int getCompletedRatio()
   dif += abs(lvl3_value3Target - analogRead(POT3));
   dif += abs(lvl3_value4Target - analogRead(POT4));
   int ratio = max(0, map(dif, 0,(1023), 100,0));//0 diff da 100, 2046 dif da 100;
-  Serial.println("Lvl3 ratio " + String(ratio));
+  //Serial.println("Lvl3 ratio " + String(ratio));
   return ratio;
 }

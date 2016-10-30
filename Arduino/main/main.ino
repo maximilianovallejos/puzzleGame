@@ -27,7 +27,7 @@ char RESTART_KEY = '#';
 Keypad keypad = Keypad(makeKeymap(Keys), K_ROW_PINS, K_COL_PINS, K_ROWS, K_COLS);
 char input;
 
-int totalLevels = 4;
+int totalLevels = 3;
 
 //estado del nivel
 bool level1Completed;
@@ -93,6 +93,8 @@ int lvl3_value4Target;//valor correcto de potencia2. ej 900
 
 //level 4 - keycode
 int lvl4_secretCodeTarget;//valor del codigo. ej 5469
+
+String lvl4Input;
 
 
 
@@ -166,6 +168,10 @@ void loop()
     {
       restartGame = true;
     }
+    else
+    {
+      lvl4AddKey(String(input));
+    }
   }
   if(restartGame)
   {
@@ -220,14 +226,14 @@ void loop()
         {
           if( digitalRead(VIB_PIN))
           {
-            //vibError++;
+            vibError++;
           }
           updateLevelStates();
           updateIndicatorLeds();
           if(anyLevelChanged)
           {
            
-            if(level1Completed && level2Completed && level3Completed && level4Completed)
+            if(level1Completed/* && level2Completed */&& level3Completed && level4Completed)
             {
               gameWon = true;
             }
@@ -235,8 +241,8 @@ void loop()
           }
           if(checkAnyError())
           {
+            playErrorSound();
             totalErrors++;
-            Serial.println("User make an error");
             Serial.print("Total errors: ");
             Serial.println(String(totalErrors));
           }
@@ -327,6 +333,10 @@ void updateDisplay()
       //secret code
       lcd.setCursor (8,0);
       lcd.print(String(lvl4_secretCodeTarget));
+
+      //errors
+      lcd.setCursor (8,1);
+      lcd.print("Err: " + String(totalErrors));
     }
     else
     {
@@ -363,7 +373,12 @@ String getRemainingFormatedTime()
 
 String getInputCode()
 {
-  return "_ _ _ _";
+  String res = lvl4Input;
+  while(res.length() < 4)
+  {
+    res = res + "_";
+  }
+  return res;
 }
 
 
@@ -411,13 +426,13 @@ void updateLevelStates()
 void playCompletedSound()
 {
   //hacer un beep corto
-  tone(SPK_PIN, 350, 2000);
+  tone(SPK_PIN, 350, 1000);
 }
 
 void playErrorSound()
 {
   //hacer un beep largo
-  tone(SPK_PIN, 150, 5000);
+  tone(SPK_PIN, 150, 2000);
 }
 
 void playTimeSound()
