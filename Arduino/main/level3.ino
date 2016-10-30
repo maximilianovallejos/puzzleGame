@@ -6,13 +6,13 @@ const int LVL3_RED = 35;
 
 const int POT1 = A1;
 const int POT2 = A2;
-const int POT3 = A3;
-const int POT4 = A4;
+const int POT3 = A14;
+const int POT4 = A15;
 
 int const LEFT = 0;
 int const RIGHT = 1023;
-int const UP = 1023;
-int const DOWN = 0;
+int const UP = 0;
+int const DOWN = 1023;
 int const NONE = 512;
 
 int blinkStep;

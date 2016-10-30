@@ -1,9 +1,9 @@
 //wires
 
 //pines
-const int WIRE1 = 20;
-const int WIRE2 = 21;
-const int WIRE3 = 22;
+const int WIRE1 = 52;
+const int WIRE2 = 50;
+const int WIRE3 = 48;
 const int LVL1_GREEN = 30;
 const int LVL1_RED = 31;
 
@@ -18,12 +18,18 @@ void lvl1Setup()
   Serial.println("lvl1Setup");
   initTarget1();
 
-  pinMode(WIRE1, INPUT);
-  pinMode(WIRE2, INPUT);
-  pinMode(WIRE3, INPUT);
+  pinMode(WIRE1, INPUT_PULLUP);
+  pinMode(WIRE2, INPUT_PULLUP);
+  pinMode(WIRE3, INPUT_PULLUP);
   
   updateWiresState();
   updateLastState();
+
+  Serial.println("wires");
+  Serial.println(digitalRead(WIRE1));
+  Serial.println(digitalRead(WIRE2));
+  Serial.println(digitalRead(WIRE3));
+  Serial.println("--");
 }
 
 void initTarget1()
@@ -92,7 +98,13 @@ bool checkChangesLvl1()
   {
     if(wiresCurrentState[i] != wiresLastState[i])
     {
+    
       Serial.println("lvl1 changed");
+      Serial.println("wires");
+      Serial.println(digitalRead(WIRE1));
+      Serial.println(digitalRead(WIRE2));
+      Serial.println(digitalRead(WIRE3));
+      Serial.println("--");
       return true;
     }
   }

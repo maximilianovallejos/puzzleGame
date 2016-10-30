@@ -3,8 +3,8 @@
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
 
-int const SPK_PIN = 9;
-int const VIB_PIN = 10;
+int const SPK_PIN = 3;
+int const VIB_PIN = 2;
 
 byte dir = 0x27;
 LiquidCrystal_I2C lcd( dir, 2, 1, 0, 4, 5, 6, 7);
@@ -13,8 +13,8 @@ bool displayEnabled = true;//for debug
 const byte K_ROWS = 4;
 const byte K_COLS = 4;
 
-byte K_ROW_PINS[] = {7, 6, 5, 4};
-byte K_COL_PINS[] = { 3, 2, 1, 0};
+byte K_ROW_PINS[] = {39,41,43,45};
+byte K_COL_PINS[] = {47,49,51,53};
 char Keys [ K_ROWS ][ K_COLS ] =
     {
         {'1','2','3','A'},
@@ -22,7 +22,7 @@ char Keys [ K_ROWS ][ K_COLS ] =
         {'7','8','9','C'},
         {'*','0','#','D'}
      };
-char RESTART_KEY = '*';
+char RESTART_KEY = '#';
 
 Keypad keypad = Keypad(makeKeymap(Keys), K_ROW_PINS, K_COL_PINS, K_ROWS, K_COLS);
 char input;
@@ -55,10 +55,10 @@ bool gameStarted;
 bool timedOut;
 bool gameWon;
 bool restartGame;
-bool vibError;
+int vibError;
 
 //tiempo total en milisegundos
-const float TOTAL_GAME_TIME = 120000;
+const float TOTAL_GAME_TIME = 30000;
 float gameStartedTime;//momento en q empieza el juego (primer movimiento)
 unsigned long remainingGameTime;//tiempo restante
 float getClockSpeed() //velocidad del reloj (aumenta por errores)
@@ -97,7 +97,11 @@ int lvl4_secretCodeTarget;//valor del codigo. ej 5469
 
 void setup()
 {
+  Serial.begin(9600);
   randomSeed(analogRead(0));
+
+  pinMode(SPK_PIN, OUTPUT);
+  pinMode(VIB_PIN, INPUT);
 
   //press # to start
   setupSession();
@@ -108,7 +112,6 @@ void setupSession()
   Serial.println("setupSession");
   gameStarted = false;
   totalErrors = 0;
-  gameStarted = false;
   timedOut = false;
   gameWon = false;
   restartGame = false;
@@ -129,7 +132,7 @@ void setupSession()
   level3Changed = false;
   level4Changed = false;
 
-  vibError = false;
+  vibError = 0;
 
   gameNumber = random(1000, 10000);//el codigo de desactvacion de 4 digitos
   Serial.print("Game number: ");
@@ -141,7 +144,11 @@ void setupSession()
   lvl4Setup();
 
   if(displayEnabled)
-    setupDisplay();
+    {
+      setupDisplay();
+      showStartMessage();
+    }
+  
 }
 
 void loop() 
@@ -198,7 +205,10 @@ void loop()
         }
         else
         {
-          vibError = digitalRead(VIB_PIN);
+          if( digitalRead(VIB_PIN))
+          {
+            vibError++;
+          }
           if(anyLevelChanged)
           {
             updateLevelStates();
@@ -225,6 +235,7 @@ void loop()
         {
            Serial.println("Start game");
           //empezo a jugar
+          gameStarted = true;
           gameStartedTime = millis();
           remainingGameTime = TOTAL_GAME_TIME;
         }
@@ -240,9 +251,10 @@ void loop()
 void updateGameTimer()
 {
    remainingGameTime = remainingGameTime - (millis() - lastCheckTime) * getClockSpeed();
+   Serial.println(String(remainingGameTime));
    if(remainingGameTime > 15000)
    {
-     if(remainingGameTime % 5000 == 0)
+     if((remainingGameTime-1000)  % 5000 <= 100)
      {
       Serial.print("Time");
       Serial.println(String(remainingGameTime/1000));
@@ -251,7 +263,7 @@ void updateGameTimer()
    }
    else
    {
-    if(remainingGameTime % 1000 == 0)
+    if((remainingGameTime -1000)% 1000 <= 100)
     {
       Serial.print("Time");
       Serial.println(String(remainingGameTime/1000));
@@ -273,42 +285,52 @@ void setupDisplay()
   //lcd.print("asd2");
 }
 
+void showStartMessage()
+{
+  Serial.println("show start message");
+   lcd.home ();
+   lcd.print("Ready to GO!");
+}
+
 //dibuja en pantalla
 void updateDisplay()
 {
-  if(isPlaying())
+  if(gameStarted)
   {
-    //timer
-    lcd.setCursor ( 0, 0 );
-    lcd.print(getRemainingFormatedTime());
-  
-    //ingreso de codigo
-    lcd.setCursor (0,1);
-    lcd.print(getInputCode());
-  
-    //secret code
-    lcd.setCursor (8,0);
-    lcd.print(String(lvl4_secretCodeTarget));
-  }
-  else
-  {
-    lcd.noDisplay();
-    lcd.clear();
-    lcd.setCursor (0,1);
-    if(timedOut)
+    if(isPlaying())
     {
-      lcd.print("Perdiste!");
+      //timer
+      lcd.setCursor ( 0, 0 );
+      lcd.print(getRemainingFormatedTime());
+    
+      //ingreso de codigo
+      lcd.setCursor (0,1);
+      lcd.print(getInputCode());
+    
+      //secret code
+      lcd.setCursor (8,0);
+      lcd.print(String(lvl4_secretCodeTarget));
     }
-    else if(gameWon)
+    else
     {
-      lcd.print("Ganaste!");
+      lcd.noDisplay();
+      lcd.clear();
+      lcd.setCursor (0,1);
+      if(timedOut)
+      {
+        lcd.print("Perdiste!");
+      }
+      else if(gameWon)
+      {
+        lcd.print("Ganaste!");
+      }
+      delay(500);
+      lcd.display();
+      delay(500);
+      lcd.noDisplay();
+      delay(500);
+      lcd.display();
     }
-    delay(500);
-    lcd.display();
-    delay(500);
-    lcd.noDisplay();
-    delay(500);
-    lcd.display();
   }
 }
 
@@ -364,19 +386,19 @@ void updateLevelStates()
 void playCompletedSound()
 {
   //hacer un beep corto
-  tone(SPK_PIN, 350, 100);
+  tone(SPK_PIN, 350, 2000);
 }
 
 void playErrorSound()
 {
   //hacer un beep largo
-  tone(SPK_PIN, 150, 1000);
+  tone(SPK_PIN, 150, 5000);
 }
 
 void playTimeSound()
 {
   //hacer un beep corto
-  tone(SPK_PIN, 150, 100);
+  tone(SPK_PIN, 250, 100);
 }
 
 //si algun nivel cambio
@@ -387,11 +409,16 @@ bool checkLevelsChanged()
 
 bool checkAnyError()
 {
-  if(vibError)
+  if(vibError >= 3)
   {
      Serial.println("vibration error");
   }
-  return checkErrorLvl1() || checkErrorLvl2() || checkErrorLvl3() || checkErrorLvl4() || vibError;
+  bool hasError = checkErrorLvl1() || checkErrorLvl2() || checkErrorLvl3() || checkErrorLvl4() || vibError > 3;
+  if(hasError)
+  {
+    vibError = 0;
+  }
+  return ;
 }
 
 
