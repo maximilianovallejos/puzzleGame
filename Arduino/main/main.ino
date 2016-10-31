@@ -62,6 +62,7 @@ int vibError;
 const float TOTAL_GAME_TIME = 300000;
 float gameStartedTime;//momento en q empieza el juego (primer movimiento)
 unsigned long remainingGameTime;//tiempo restante
+unsigned long nextBeep;
 float getClockSpeed() //velocidad del reloj (aumenta por errores)
 {
   return totalErrors * 2;
@@ -196,12 +197,14 @@ void loop()
     if(lost)
     {
       //perdio
+      playLostSound();
        if(displayEnabled)
         updateDisplay();
     }
     else if(gameWon)
     {
       Serial.println("Game WON!!");
+      playWonSound();
       //gano
        if(displayEnabled)
         updateDisplay();
@@ -217,7 +220,7 @@ void loop()
       if(isPlaying() )
       {
        
-        if(remainingGameTime <= 0)
+        if(remainingGameTime <= 0 || TOTAL_GAME_TIME < remainingGameTime)
         {
           //se termino el tiempo
           timedOut = true;
@@ -259,6 +262,7 @@ void loop()
           gameStarted = true;
           gameStartedTime = millis();
           remainingGameTime = TOTAL_GAME_TIME;
+          nextBeep = TOTAL_GAME_TIME;
         }
       }
       if(displayEnabled)
@@ -271,26 +275,32 @@ void loop()
 //actualizar reloj
 void updateGameTimer()
 {
-   remainingGameTime = remainingGameTime - ((millis() - lastCheckTime) + (millis() - lastCheckTime) * getClockSpeed());
+  remainingGameTime = remainingGameTime - ((millis() - lastCheckTime) + (millis() - lastCheckTime) * getClockSpeed());
+  if(nextBeep > remainingGameTime)
+  {
+    playTimeSound();
    //Serial.println(String(remainingGameTime));
    if(remainingGameTime > 15000)
    {
-     if((remainingGameTime-1000)  % 5000 <= 100)
+     nextBeep = remainingGameTime - 5000;
+     /*if((remainingGameTime-1000)  % 5000 <= 100)
      {
       Serial.print("Time");
       Serial.println(String(remainingGameTime/1000));
       playTimeSound();
-     }
+     }*/
    }
    else
    {
-    if((remainingGameTime -1000)% 1000 <= 100)
+    nextBeep = remainingGameTime - 1000;
+    /*if((remainingGameTime -1000)% 1000 <= 100)
     {
       Serial.print("Time");
       Serial.println(String(remainingGameTime/1000));
       playTimeSound();
-    }
+    }*/
    }
+  }
 }
 
 void setupDisplay()
@@ -330,9 +340,9 @@ void updateDisplay()
       lcd.setCursor (0,1);
       lcd.print(getInputCode());
     
-      //secret code
+      //serial code
       lcd.setCursor (8,0);
-      lcd.print(String(lvl4_secretCodeTarget));
+      lcd.print("n: " + String(gameNumber));
 
       //errors
       lcd.setCursor (8,1);
@@ -426,13 +436,28 @@ void updateLevelStates()
 void playCompletedSound()
 {
   //hacer un beep corto
-  tone(SPK_PIN, 350, 1000);
+  tone(SPK_PIN, 350, 200);
+  delay(200);
+  tone(SPK_PIN, 350, 200);
 }
 
 void playErrorSound()
 {
   //hacer un beep largo
-  tone(SPK_PIN, 150, 2000);
+  tone(SPK_PIN, 150, 1000);
+}
+
+
+void playLostSound()
+{
+  //hacer un beep largo
+  tone(SPK_PIN, 150, 200);
+}
+
+void playWonSound()
+{
+  //hacer un beep largo
+  tone(SPK_PIN, 150, 200);
 }
 
 void playTimeSound()

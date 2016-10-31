@@ -23,7 +23,44 @@ void lvl4Setup()
 
 void initTarget4()
 {
-  lvl4_secretCodeTarget = gameNumber;
+  String tSeed = String(gameNumber).substring(3,4);
+  Serial.println("lvl4 seed " + tSeed);
+  int iSeed = tSeed.toInt();
+  //lvl4_secretCodeTarget = (gameNumber * (iSeed + 1));
+   switch(tSeed.toInt())
+  {
+    case 1:
+    lvl4_secretCodeTarget = 3529;
+    break;
+    case 2:
+    lvl4_secretCodeTarget = 2687;
+    break;
+    case 3:
+    lvl4_secretCodeTarget = 1296;
+    break;
+    case 4:
+    lvl4_secretCodeTarget = 4568;
+    break;
+    case 5:
+    lvl4_secretCodeTarget = 8456;
+    break;
+    case 6:
+    lvl4_secretCodeTarget = 9841;
+    break;
+    case 7:
+    lvl4_secretCodeTarget = 7865;
+    break;
+    case 8:
+    lvl4_secretCodeTarget = 3218;
+    break;
+    case 9:
+    lvl4_secretCodeTarget = 4128;
+    break;
+    case 0:
+    lvl4_secretCodeTarget = 1329;
+    break;
+  }
+  Serial.println("lvl4 target " + String(lvl4_secretCodeTarget));
 }
 
 void lvl4Update()
